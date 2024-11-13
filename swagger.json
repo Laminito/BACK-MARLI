@@ -1,0 +1,873 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0.0",
+    "description": "Documentation de l'API pour Back Marlin"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Serveur de développement"
+    }
+  ],
+  "paths": {
+    "/create": {
+      "post": {
+        "summary": "Créer un nouveau bien",
+        "tags": [
+          "Biens"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nom": {
+                    "type": "string",
+                    "description": "Nom du bien",
+                    "example": "Appartement T3"
+                  },
+                  "prix": {
+                    "type": "number",
+                    "description": "Prix du bien",
+                    "example": 100000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Bien créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ref": {
+                      "type": "string",
+                      "description": "Référence unique du bien"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/update": {
+      "patch": {
+        "summary": "Mettre à jour un bien existant",
+        "tags": [
+          "Biens"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Référence unique du bien"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nom": {
+                    "type": "string",
+                    "description": "Nom mis à jour du bien"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bien mis à jour avec succès"
+          },
+          "404": {
+            "description": "Bien non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/delete": {
+      "delete": {
+        "summary": "Supprimer un bien",
+        "tags": [
+          "Biens"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Référence unique du bien"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bien supprimé avec succès"
+          },
+          "404": {
+            "description": "Bien non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/get-one": {
+      "get": {
+        "summary": "Récupérer un bien spécifique",
+        "description": "Récupère les détails d'un bien spécifique basé sur sa référence.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "description": "Référence du bien à récupérer.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bien trouvé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ref": {
+                      "type": "string",
+                      "description": "La référence du bien."
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Le statut du bien."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bien non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/all-biens": {
+      "get": {
+        "summary": "Récupérer tous les biens",
+        "description": "Récupère tous les biens avec pagination, tri et filtres.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "description": "Numéro de la page (par défaut = 1)",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "description": "Nombre de biens par page (par défaut = 10)",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "triPar",
+            "description": "Ordre de tri des biens (`croissant` ou `decroissant`).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "croissant",
+                "decroissant"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "bienId",
+            "description": "Filtre par référence unique du bien.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Filtre par statut du bien.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "typeBien",
+            "description": "Filtre par type de bien (insensible à la casse).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "budgets",
+            "description": "Filtre pour un budget maximum.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "localisation",
+            "description": "Filtre par localisation (insensible à la casse).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "superficie",
+            "description": "Filtre pour la superficie minimale.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des biens récupérée avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "biens": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ref": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "typeBien": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "hasMore": {
+                      "type": "boolean",
+                      "description": "Indique s'il reste plus de biens à récupérer."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/images/{repertoire}/{key}": {
+      "get": {
+        "summary": "Récupère une image d'utilisateur",
+        "description": "Retourne le flux de l'image stockée dans le répertoire spécifié.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "repertoire",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Le répertoire où l'image est stockée."
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "La clé unique de l'image."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image récupérée avec succès.",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fichier non trouvé."
+          }
+        }
+      }
+    },
+    "/update-image": {
+      "put": {
+        "summary": "Met à jour une image d'un bien immobilier",
+        "description": "Met à jour l'image d'un bien immobilier dans la galerie.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Index de la galerie pour l'image à mettre à jour."
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "La référence du bien."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image mise à jour avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "imagePath": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur de validation ou de mise à jour."
+          }
+        }
+      }
+    },
+    "/medias/{repertoire}/{key}": {
+      "delete": {
+        "summary": "Supprime une image d'un bien immobilier",
+        "description": "Supprime l'image d'un bien immobilier spécifique de la galerie.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "repertoire",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Le répertoire où l'image est stockée."
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "La clé unique de l'image."
+          },
+          {
+            "in": "query",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Index de l'image dans la galerie."
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "La référence du bien."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image supprimée avec succès."
+          },
+          "404": {
+            "description": "Bien non trouvé."
+          }
+        }
+      }
+    },
+    "/wanted-image": {
+      "post": {
+        "summary": "Ajoute une image pour un avis de recherche",
+        "description": "Téléverse une image pour un nouvel avis de recherche.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Image ajoutée avec succès."
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/get-wanteds": {
+      "get": {
+        "summary": "Récupère tous les avis de recherche",
+        "description": "Retourne une liste des avis de recherche existants.",
+        "responses": {
+          "200": {
+            "description": "Liste des avis de recherche récupérée avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur."
+          }
+        }
+      }
+    },
+    "/delete-wanted": {
+      "delete": {
+        "summary": "Supprime une image d'avis de recherche",
+        "description": "Supprime une image spécifique d'un avis de recherche.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "La clé unique de l'image à supprimer."
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "L'identifiant de l'avis de recherche."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image supprimée avec succès."
+          },
+          "401": {
+            "description": "Échec de suppression."
+          }
+        }
+      }
+    },
+    "/user/contact-us": {
+      "post": {
+        "summary": "Envoi d'un message de contact",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "titleMessage": {
+                    "type": "string"
+                  },
+                  "motif": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "contenu": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message envoyé avec succès"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/user/wanted": {
+      "post": {
+        "summary": "Envoi d'une demande de bien recherché",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "localisation": {
+                    "type": "string"
+                  },
+                  "typeBien": {
+                    "type": "string"
+                  },
+                  "superficie": {
+                    "type": "number"
+                  },
+                  "pieces": {
+                    "type": "integer"
+                  },
+                  "budget": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message envoyé avec succès"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/user/selling": {
+      "post": {
+        "summary": "Envoi d'une demande pour vendre un bien",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "localisation": {
+                    "type": "string"
+                  },
+                  "typeBien": {
+                    "type": "string"
+                  },
+                  "superficie": {
+                    "type": "number"
+                  },
+                  "pieces": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message envoyé avec succès"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/user/tk-log": {
+      "get": {
+        "summary": "Vérification de la connexion de l'utilisateur par token",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "L'utilisateur est connecté"
+          },
+          "401": {
+            "description": "Non autorisé ou token invalide"
+          }
+        }
+      }
+    },
+    "/user/add-review": {
+      "post": {
+        "summary": "Ajout d'un avis client",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pseudo": {
+                    "type": "string"
+                  },
+                  "stars": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avis ajouté avec succès"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/user/reviews": {
+      "get": {
+        "summary": "Récupération de tous les avis clients",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "allreviews",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Indique si tous les avis (validés ou non) doivent être récupérés"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des avis clients",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pseudo": {
+                        "type": "string"
+                      },
+                      "stars": {
+                        "type": "integer"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/user/validation-review": {
+      "patch": {
+        "summary": "Validation ou mise à jour du statut d'un avis client",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "invalid"
+              ]
+            },
+            "description": "Statut de l'avis client"
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'avis client"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut de l'avis mis à jour avec succès"
+          },
+          "404": {
+            "description": "Avis non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": []
+}

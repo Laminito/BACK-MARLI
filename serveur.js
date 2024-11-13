@@ -7,9 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 8080;
 
-const setupSwagger = require('./swagger');
+const { setupSwagger } = require('./swagger-config.js');  // Assurez-vous que le chemin est correct
 
-// Après avoir configuré vos routes, ajoutez cette ligne pour initialiser Swagger
 setupSwagger(app);
 
 

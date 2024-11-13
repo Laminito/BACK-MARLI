@@ -9,7 +9,8 @@
   "main": "serveur.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon serveur.js"
+    "start": "nodemon serveur.js",
+    "generate-swagger": "node generate-swagger.js"
   },
   "author": "kamaraab",
   "license": "ISC",

@@ -1,15 +1,13 @@
-// swagger.js
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-// Configuration Swagger
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'API Documentation',
       version: '1.0.0',
-      description: 'Documentation de l\'API pour votre projet',
+      description: 'Documentation de l\'API pour Back Marlin',
     },
     servers: [
       {
@@ -27,4 +25,4 @@ function setupSwagger(app) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 
-module.exports = setupSwagger;
+module.exports = { swaggerSpec, setupSwagger };
