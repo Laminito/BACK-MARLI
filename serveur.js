@@ -7,6 +7,12 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 8080;
 
+const setupSwagger = require('./swagger');
+
+// Après avoir configuré vos routes, ajoutez cette ligne pour initialiser Swagger
+setupSwagger(app);
+
+
 // Importation des differentes routes
 const userRouteur = require("./routes/User/UserLog/user");
 const imagesBienRouteur = require("./routes/Bien/GestionImages/GestionImages");
